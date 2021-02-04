@@ -1,0 +1,28 @@
+[
+ [
+  "正方飞机",
+  "postivePlane",
+  null,
+  null,
+  true,
+  true
+ ],
+ [
+  "正方子弹",
+  "postiveBullet",
+  null,
+  null,
+  true
+ ],
+ [
+  "反方飞机",
+  "antiPlane",
+  true,
+  true
+ ],
+ [
+  "反方子弹",
+  "antiBullet",
+  true
+ ]
+]

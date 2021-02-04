@@ -1,0 +1,12 @@
+[
+ [
+  1001,
+  "game_object_release/release_common/release_common",
+  1.5
+ ],
+ [
+  2001,
+  "game_object_hit/hit_common/hit_common",
+  1.5
+ ]
+]
