@@ -1,4 +1,5 @@
 
+import ViewOrdinary from '../game/view/ViewOrdinary';
 import jiang from './Jiang';
 const { ccclass, property } = cc._decorator;
 
@@ -9,13 +10,12 @@ export class Index extends cc.Component {
     public uiContainer: cc.Node = null as any;
 
     onLoad () {
-        this.getComponent(cc.Button)
         jiang.Init
         (
             this.uiContainer
         ) 
         .then(() => {
-
+            jiang.mgrView.OpenNoArgsView(ViewOrdinary.registMsg);
         });
     }
 }

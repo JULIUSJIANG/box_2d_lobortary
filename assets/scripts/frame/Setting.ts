@@ -7,7 +7,7 @@ namespace Setting {
     /**
      * ui 的预制体所在的目录
      */
-    export const uiPrefabFolderDir = `view_ui__prefab`;
+    export const uiPrefabFolderDir = `view`;
 
     /**
      * 加载界面
