@@ -20,8 +20,8 @@ namespace b2Extend {
         var euler = trans.GetAngle();
         var pos = trans.GetPosition();
         return MergeMat(
-            GetRotateMat(euler),
-            GetPosMat(pos.x, pos.y)
+            GetPosMat(pos.x, pos.y),
+            GetRotateMat(euler)
         );
     }
 

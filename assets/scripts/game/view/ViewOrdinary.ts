@@ -26,23 +26,23 @@ export default class ViewOrdinary extends MgrViewNoArgsViewBasic {
         const bd = new b2BodyDef();
         bd.type = b2BodyType.b2_dynamicBody;
         bd.allowSleep = false;
-        bd.position.Set(0, 10);
+        bd.position.Set(0, 0);
         const body = m_world.CreateBody(bd);
 
         const shape = new b2PolygonShape();
-        shape.SetAsBox(0.5, 10, new b2Vec2(10, 0), 0);
+        shape.SetAsBox(0.125, 10, new b2Vec2(10, 0), 0);
         body.CreateFixture(shape, 5);
-        shape.SetAsBox(0.5, 10, new b2Vec2(-10, 0), 0);
+        shape.SetAsBox(0.125, 10, new b2Vec2(-10, 0), 0);
         body.CreateFixture(shape, 5);
-        shape.SetAsBox(10, 0.5, new b2Vec2(0, 10), 0);
+        shape.SetAsBox(10, 0.125, new b2Vec2(0, 10), 0);
         body.CreateFixture(shape, 5);
-        shape.SetAsBox(10, 0.5, new b2Vec2(0, -10), 0);
+        shape.SetAsBox(10, 0.125, new b2Vec2(0, -10), 0);
         body.CreateFixture(shape, 5);
 
         const jd = new b2RevoluteJointDef();
         jd.bodyA = ground;
         jd.bodyB = body;
-        jd.localAnchorA.Set(0, 10);
+        jd.localAnchorA.Set(0, 0);
         jd.localAnchorB.Set(0,0);
         jd.referenceAngle = 0;
         jd.motorSpeed = 0.05 * b2_pi;
@@ -50,21 +50,21 @@ export default class ViewOrdinary extends MgrViewNoArgsViewBasic {
         jd.enableMotor = true;
 
         const m_joint = m_world.CreateJoint(jd);
-
         let totalGenCount = 0;
-
         var frameMsClock = new FrameMsClock();
-
+        let isBaned = false;
         frameMsClock.evntMsPassed.On((passedMs) => {
-            m_world.Step(passedMs / 1000, 8, 3, 1);
+            m_world.Step(passedMs / 1000, 1, 1, 1);
+            Box2DDrawer.inst.DrawB2World(m_world);
 
-            if (10 <= totalGenCount) {
+            if (33 < passedMs || isBaned) {
+                isBaned = true;
                 return;
             };
 
             const bd = new b2BodyDef();
             bd.type = b2BodyType.b2_dynamicBody;
-            bd.position.Set(0.0, 10.0);
+            bd.position.Set(0, 0);
             const body = m_world.CreateBody(bd);
 
             const shape = new b2PolygonShape();
@@ -73,7 +73,8 @@ export default class ViewOrdinary extends MgrViewNoArgsViewBasic {
 
             totalGenCount++;
         });
-        Box2DDrawer.inst.SetB2World(m_world);
+
         frameMsClock.Resume();
+        Box2DDrawer.inst.DrawB2World(m_world);
     }
 }

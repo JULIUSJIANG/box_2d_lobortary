@@ -32,11 +32,9 @@ export default class Box2DDrawer extends cc.Component {
 
     private _b2w: b2World;
 
-    public SetB2World (b2w: b2World) {
+    public DrawB2World (b2w: b2World) {
         this._b2w = b2w;
-    }
 
-    public update () {
         this.graphics.clear();
         if (this._b2w == null) {
             return;
@@ -80,7 +78,6 @@ export default class Box2DDrawer extends cc.Component {
         this._tempPos.z = 1;
 
         b2Mat33.MulM33V3(mat, this._tempPos, this._tempPos);
-
         this._tempPos.x *= 20;
         this._tempPos.y *= 20;
 
@@ -102,7 +99,7 @@ export default class Box2DDrawer extends cc.Component {
             this.graphics.lineTo(this._tempPos.x, this._tempPos.y);
         };
         this.graphics.close();
-        this.graphics.fillColor = color;
+        this.graphics.fillColor = color.lerp(cc.Color.BLACK, 0.5);
         this.graphics.fill();
         this.graphics.strokeColor = color;
         this.graphics.stroke();
