@@ -130,6 +130,54 @@ namespace utilMath {
     export function GetShadowPos (axisX: number, axisY: number, vecX: number, vecY: number) {
         return axisX * vecX + axisY * vecY;
     }
+
+    /**
+     * 获取 2D 的旋转矩阵
+     * @param piEuler 
+     */
+    export function Get2DRotateMat (piEuler: number) {
+        let cosEuler = Math.cos(piEuler);
+        let sinEuler = Math.sin(piEuler);
+        return [
+            cosEuler, -sinEuler, 0,
+            sinEuler, cosEuler, 0,
+            0, 0, 1
+        ];
+    }
+
+    /**
+     * 获取 2D 的位移矩阵
+     * @param x 
+     * @param y 
+     */
+    export function Get2DPosMat (x: number, y: number) {
+        return [
+            1, 0, x,
+            0, 1, y,
+            0, 0, 1
+        ];
+    }
+
+    export function Merge2DMat (leftMat: number[], rightMat: number[]) {
+        return [
+            
+        ];
+    }
+
+    /**
+     * 访问 2D 矩阵里面的值
+     * @param mat 2d 变换矩阵
+     * @param row 行
+     * @param column 列
+     */
+    function Get2DMatVal (mat: number[], row: number, column: number) {
+        // [
+        //     0x00, 0x01, 0x02,
+        //     0x10, 0x11, 0x12,
+        //     0x20, 0x21, 0x22
+        // ]
+        return mat[3 * row + column];
+    }
 }
 
 export default utilMath;
