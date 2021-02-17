@@ -15,6 +15,7 @@ export default class ViewOrdinary extends MgrViewNoArgsViewBasic {
     public static registMsg: ViewRegistMsg<ViewOrdinary> = new ViewRegistMsg<ViewOrdinary>(`view_ordinary`, () => ViewOrdinary);
 
      public onLoad () {
+         console.error(`这里？`);
         const b2grav = {
             x: 0,
             y: -1
