@@ -15,7 +15,6 @@ export default class ViewOrdinary extends MgrViewNoArgsViewBasic {
     public static registMsg: ViewRegistMsg<ViewOrdinary> = new ViewRegistMsg<ViewOrdinary>(`view_ordinary`, () => ViewOrdinary);
 
      public onLoad () {
-         console.error(`这里？`);
         const b2grav = {
             x: 0,
             y: -1
@@ -51,17 +50,11 @@ export default class ViewOrdinary extends MgrViewNoArgsViewBasic {
         jd.enableMotor = true;
 
         const m_joint = m_world.CreateJoint(jd);
-        let totalGenCount = 0;
+
         var frameMsClock = new FrameMsClock();
-        let isBaned = false;
         frameMsClock.evntMsPassed.On((passedMs) => {
             m_world.Step(passedMs / 1000, 1, 1, 1);
             Box2DDrawer.inst.DrawB2World(m_world);
-
-            if (33 < passedMs || isBaned) {
-                isBaned = true;
-                return;
-            };
 
             const bd = new b2BodyDef();
             bd.type = b2BodyType.b2_dynamicBody;
@@ -71,8 +64,6 @@ export default class ViewOrdinary extends MgrViewNoArgsViewBasic {
             const shape = new b2PolygonShape();
             shape.SetAsBox(0.125, 0.125);
             body.CreateFixture(shape, 1.0);
-
-            totalGenCount++;
         });
 
         frameMsClock.Resume();
