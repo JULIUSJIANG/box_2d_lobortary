@@ -13,12 +13,24 @@ import dataCenter from "../DataCenter";
 const {ccclass, property} = cc._decorator;
 
 @ccclass
-export default class RadioBtn extends cc.Component {
+export default class CheckBox extends cc.Component {
     /**
      * 按钮的文本组件
      */
     @property(cc.Label)
     private label: cc.Label = null;
+
+    /**
+     * 按钮的文本组件
+     */
+    @property(cc.Label)
+    private actLab: cc.Label = null;
+
+    /**
+     * 表明当前是激活状态的节点
+     */
+    @property(cc.Node)
+    private activeNode: cc.Node = null;
 
     /**
      * 用于交互的节点
@@ -27,27 +39,24 @@ export default class RadioBtn extends cc.Component {
     private touchNode: cc.Node = null;
 
     /**
-     * 无参数事件广播器
-     */
-    public evter: EventerNoArgs = new EventerNoArgs();
-
-    /**
-     * 索引
+     * 对应的索引
      */
     private index: number;
+
+    public readonly evter: EventerNoArgs = new EventerNoArgs();
 
     public Init (
         index: number
     ) {
         this.index = index;
-        let cfg = configCenter.examArr[index];
-        this.label.string = `${cfg.info}`;
+        let cfg = configCenter.checkBoxData[index];
+        this.label.string = this.actLab.string = cfg.info;
         this.touchNode.on(cc.Node.EventType.TOUCH_START, () => {
             this.evter.Call();
         });
     }
 
     public Refresh () {
-        this.touchNode.active = this.index != dataCenter.vo.selectExam;
+        this.activeNode.active = dataCenter.vo.enableRec[this.index];
     }
 }

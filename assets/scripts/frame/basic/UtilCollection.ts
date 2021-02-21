@@ -34,6 +34,18 @@ namespace utilCollection {
         });
         return coll;
     }
+
+    /**
+     * 获取列表的集合
+     * @param coll 
+     */
+    export function GetCollSet <T> (coll: T[]) {
+        let set = new Set<T>();
+        coll.forEach((ele) => {
+            set.add(ele);
+        });
+        return set;
+    }
 }
 
 export default utilCollection;

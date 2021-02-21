@@ -12,98 +12,9 @@ import { b2BodyDef, b2BodyType, b2PolygonShape, b2World } from '../../lib/box2d_
 import B2ExamTumber from './b2_example/B2ExamTumber';
 import FrameMsClock from '../../frame/basic/FrameMsClock';
 import Box2DDrawer from '../component/Box2DDrawer';
+import dataCenter from '../DataCenter';
+import configCenter from '../ConfigCenter';
 const {ccclass, property} = cc._decorator;
-
-/**
- * 每个按钮记录
- */
-interface BtnRec {
-    info: string;
-    b2WorldCreator: () => b2World
-}
-
-const btnData: BtnRec[] = [
-    {
-        info: `Sparky`,
-        b2WorldCreator: null
-    },
-    {
-        info: `Shape Cast`,
-        b2WorldCreator: null
-    },
-    {
-        info: `Time of Impact` ,
-        b2WorldCreator: null
-    },
-    {
-        info: `Character Collision`,
-        b2WorldCreator: null
-    },
-    {
-        info: `Tiles`,
-        b2WorldCreator: null
-    },
-    {
-        info: `Heavy on Light`,
-        b2WorldCreator: null
-    },
-    {
-        info: `Heavy on Light Two`,
-        b2WorldCreator: null
-    },
-    {
-        info: `Vertical Stack`,
-        b2WorldCreator: null
-    },
-    {
-        info: `Basic Slider Crank`,
-        b2WorldCreator: null
-    },
-    {
-        info: `Slider Crank`,
-        b2WorldCreator: null
-    },
-    {
-        info: `Sphere Stack`,
-        b2WorldCreator: null
-    },
-    {
-        info: `Convex Hull`,
-        b2WorldCreator: null
-    },
-    {
-        info: `Tumber`,
-        b2WorldCreator: B2ExamTumber
-    },
-    {
-        info: `Ray-Cast`,
-        b2WorldCreator: null
-    },
-    {
-        info: `Dump Shell`,
-        b2WorldCreator: null
-    },
-    {
-        info: `Apply Force`,
-        b2WorldCreator: null
-    },
-    {
-        info: `Continuous Test`,
-        b2WorldCreator: null
-    },
-    {
-        info: `Motor Joint`,
-        b2WorldCreator: null
-    },
-    {
-        info: `One-Sided Platform`,
-        b2WorldCreator: null
-    },
-    {
-        info: `Mobile`,
-        b2WorldCreator: null
-    }
-]
 
 @ccclass
 export default class ViewMain extends MgrViewNoArgsViewBasic {
@@ -120,24 +31,30 @@ export default class ViewMain extends MgrViewNoArgsViewBasic {
         let m_world: b2World;
         this.radioContainer.removeAllChildren();
         let evter = new EventerWithArgs<number>();
-        btnData.forEach((val, index) => {
+        let rbList: RadioBtn[] = [];
+        configCenter.examArr.forEach(( cfg, index ) => {
             let inst = cc.instantiate(this.radioBtnPrefab).getComponent(RadioBtn);
             this.radioContainer.addChild(inst.node);
             inst.Init(
-                val.info,
-                index,
-                evter
+                index
             );
-            evter.On((id) => {
-                if (id == index) {
-                    // 切换世界
-                    m_world = val.b2WorldCreator ? val.b2WorldCreator() : null;
-                    // 进行画面绘制
-                    Box2DDrawer.inst.DrawB2World(m_world);
-                };
+            inst.evter.On(() => {
+                evter.Call(index);
+            });
+            rbList.push(inst);
+        });
+        evter.On((index) => {
+            dataCenter.vo.selectExam = index;
+            var current = configCenter.examArr[index];
+            // 切换世界
+            m_world = current.b2WorldCreator ? current.b2WorldCreator() : null;
+            // 进行画面绘制
+            Box2DDrawer.inst.DrawB2World(m_world);
+            rbList.forEach(( rb ) => {
+                rb.Refresh();
             });
         });
-        evter.Call(0);
+        evter.Call(dataCenter.vo.selectExam);
 
         var frameMsClock = new FrameMsClock();
         frameMsClock.evntMsPassed.On((passedMs) => {

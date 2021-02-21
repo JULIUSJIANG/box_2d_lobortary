@@ -5,8 +5,12 @@
 // Learn life-cycle callbacks:
 //  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
 
+import EventerNoArgs from "../../frame/basic/EventerNoArgs";
 import b2Extend from "../../lib/b2_extend/B2Extend";
 import { b2AABB, b2Body, b2Color, b2Draw, b2DrawFlags, b2Fixture, b2Mat33, b2PolygonShape, b2Transform, b2Vec2, b2Vec3, b2World, b2_pi } from "../../lib/box2d_ts/Box2D";
+import configCenter from "../ConfigCenter";
+import CheckBox from "./CheckBox";
+import dataCenter from "../DataCenter";
 
 const {ccclass, property} = cc._decorator;
 
@@ -22,11 +26,34 @@ export default class Box2DDrawer extends cc.Component {
     private graphics: cc.Graphics = null;
 
     /**
+     * 复选框预制体
+     */
+    @property(cc.Prefab)
+    private checkBoxPrefab: cc.Prefab = null;
+
+    @property(cc.Node)
+    private checkBoxContainer: cc.Node = null;
+
+    /**
      * 全局实例
      */
     public static inst: Box2DDrawer;
 
     public onLoad () {
+        this.checkBoxContainer.removeAllChildren();
+        configCenter.checkBoxData.forEach(( val, index ) => {
+            let inst = cc.instantiate(this.checkBoxPrefab).getComponent(CheckBox);
+            this.checkBoxContainer.addChild(inst.node);
+            inst.Init(
+                index
+            );
+            inst.Refresh();
+            inst.evter.On(() => {
+                dataCenter.vo.enableRec[`${index}`] = !dataCenter.vo.enableRec[`${index}`];
+                inst.Refresh();
+            });
+        });
+
         Box2DDrawer.inst = this;
     }
 
