@@ -7,7 +7,7 @@
 
 import EventerNoArgs from "../../frame/basic/EventerNoArgs";
 import b2Extend from "../../lib/b2_extend/B2Extend";
-import { b2AABB, b2Body, b2BodyDef, b2Color, b2Draw, b2DrawFlags, b2Fixture, b2Mat33, b2PolygonShape, b2Transform, b2Vec2, b2Vec3, b2World, b2_pi } from "../../lib/box2d_ts/Box2D";
+import { b2AABB, b2Body, b2BodyDef, b2Color, b2Draw, b2DrawFlags, b2Fixture, b2Joint, b2Mat33, b2PolygonShape, b2Transform, b2Vec2, b2Vec3, b2World, b2_pi } from "../../lib/box2d_ts/Box2D";
 import configCenter from "../ConfigCenter";
 import CheckBox from "./CheckBox";
 import dataCenter from "../DataCenter";
@@ -89,9 +89,20 @@ export default class Box2DDrawer extends cc.Component {
             };
         };
 
+        if (this._currDrawTag & configCenter.DRAW_JOINTS) {
+            for (let j = this._b2w.GetJointList(); j; j = j .GetNext()) {
+                this.DrawJoint(j);
+            };
+        };
+
         for (let b = this._b2w.GetBodyList(); b; b = b.GetNext()) {
             let trans = b.GetTransform();
             let mat = b2Extend.GetTransMat(trans);
+
+            if (this._currDrawTag & configCenter.DRAW_CENTER_OF_MASSES) {
+                this.DrawTransform(mat);
+            };
+
             for (let f = b.GetFixtureList(); f; f = f.GetNext()) {
                 if (this._currDrawTag & configCenter.DRAW_AABB) {
                     for (let i = 0; i < f.m_proxyCount; i++) {
@@ -109,6 +120,76 @@ export default class Box2DDrawer extends cc.Component {
     }
 
     /**
+     * 预制约束
+     * @param b2j 
+     */
+    private DrawJoint (b2j: b2Joint) {
+        this.graphics.fillColor = configCenter.color.joint.dot;
+        this.graphics.strokeColor = configCenter.color.joint.area;
+        this.graphics.lineCap = cc.Graphics.LineCap.ROUND;
+        this.graphics.lineWidth = configCenter.jointLineWitdh;
+
+        let bodyA = b2j.GetBodyA();
+        let transformA = bodyA.GetTransform();
+        let matA = b2Extend.GetTransMat(transformA);
+
+        this.Transform(configCenter.posO, matA);
+        this.GraphicsMoveTo(this._tempPos.x, this._tempPos.y);
+
+        b2j.GetAnchorA(this._tempPos);
+        this.TransformForV3(this._tempPos, matA);
+        this.GraphicsLineTo(this._tempPos.x, this._tempPos.y);
+
+        this.graphics.stroke();
+        this.GraphicsMoveTo(this._tempPos.x, this._tempPos.y);
+
+        let bodyB = b2j.GetBodyB();
+        let transformB = bodyB.GetTransform();
+        let matB = b2Extend.GetTransMat(transformB);
+
+        this.Transform(configCenter.posO, matB);
+        this.GraphicsLineTo(this._tempPos.x, this._tempPos.y);
+        this.graphics.stroke();
+
+        // 连接点
+
+        this.Transform(configCenter.posO, matA);
+        this.ArcCycle(this._tempPos.x, this._tempPos.y, configCenter.hhJointLineWidth)
+        this.graphics.fill();
+
+        b2j.GetAnchorA(this._tempPos);
+        this.TransformForV3(this._tempPos, matA);
+        this.ArcCycle(this._tempPos.x, this._tempPos.y, configCenter.hhJointLineWidth)
+        this.graphics.fill();
+
+        this.Transform(configCenter.posO, matB);
+        this.ArcCycle(this._tempPos.x, this._tempPos.y, configCenter.hhJointLineWidth)
+        this.graphics.fill();
+    }
+
+    /**
+     * 绘制变换
+     * @param mat 
+     */
+    private DrawTransform (mat: b2Mat33) {
+        let posO = this.Transform(configCenter.posO, mat);
+        this.GraphicsMoveTo(posO.x, posO.y);
+        let xAxis = this.Transform(configCenter.xAxis, mat);
+        this.GraphicsLineTo(xAxis.x, xAxis.y);
+        this.graphics.strokeColor = configCenter.color.transform.xColor;
+        this.graphics.lineWidth = 2;
+        this.graphics.stroke();
+
+        posO = this.Transform(configCenter.posO, mat);
+        this.GraphicsMoveTo(posO.x, posO.y);
+        let yAxis = this.Transform(configCenter.yAxis, mat);
+        this.GraphicsLineTo(yAxis.x, yAxis.y);
+        this.graphics.strokeColor = configCenter.color.transform.yColor;
+        this.graphics.lineWidth = 2;
+        this.graphics.stroke();
+    }
+
+    /**
      * 绘制碰撞盒
      * @param aabb 
      */
@@ -119,6 +200,7 @@ export default class Box2DDrawer extends cc.Component {
         this.GraphicsLineTo(aabb.lowerBound.x, aabb.upperBound.y);
         this.GraphicsLineTo(aabb.lowerBound.x, aabb.lowerBound.y);
         this.graphics.strokeColor = configCenter.color.aabb;
+        this.graphics.lineWidth = 2;
         this.graphics.stroke();
     }
 
@@ -159,6 +241,13 @@ export default class Box2DDrawer extends cc.Component {
         this._tempPos.x = b2Vec2.x;
         this._tempPos.y = b2Vec2.y;
         this._tempPos.z = 1;
+        return this.TransformForV3(this._tempPos, mat);
+    }
+
+    private TransformForV3 (b2Vec3: b2Vec3, mat: b2Mat33) {
+        this._tempPos.x = b2Vec3.x;
+        this._tempPos.y = b2Vec3.y;
+        this._tempPos.z = b2Vec3.z;
 
         b2Mat33.MulM33V3(mat, this._tempPos, this._tempPos);
 
@@ -183,13 +272,34 @@ export default class Box2DDrawer extends cc.Component {
         this.graphics.fillColor = configCenter.color.shape.body;
         this.graphics.fill();
         this.graphics.strokeColor = configCenter.color.shape.outline;
+        this.graphics.lineWidth = 2;
         this.graphics.stroke();
     }
 
+    /**
+     * 画圆
+     * @param x 
+     * @param y 
+     * @param radius 
+     */
+    private ArcCycle (x: number, y: number, radius: number) {
+        this.graphics.arc(x * configCenter.b2ShapeScale, y * configCenter.b2ShapeScale, radius, 0, 360, true);
+    }
+
+    /**
+     * 把画笔移动至目标位置
+     * @param x 
+     * @param y 
+     */
     private GraphicsMoveTo (x: number, y: number) {
         this.graphics.moveTo(x * configCenter.b2ShapeScale, y * configCenter.b2ShapeScale);
     }
 
+    /**
+     * 把画笔画至目标位置
+     * @param x 
+     * @param y 
+     */
     private GraphicsLineTo (x: number, y: number) {
         this.graphics.lineTo(x * configCenter.b2ShapeScale, y * configCenter.b2ShapeScale);
     }

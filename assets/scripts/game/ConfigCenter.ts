@@ -1,4 +1,4 @@
-import { b2World } from "../lib/box2d_ts/Box2D";
+import { b2Vec2, b2World } from "../lib/box2d_ts/Box2D";
 import B2ExamTumber from "./view/b2_example/B2ExamTumber";
 
 namespace configCenter {
@@ -97,15 +97,7 @@ namespace configCenter {
         }
     ]
 
-    /**
-     * 绘制形状的标签
-     */
-    export const DRAW_SHAPE = 2**0;
 
-    /**
-     * 绘制碰撞盒的标签
-     */
-    export const DRAW_AABB = 2**1;
 
     /**
      * 画面元素单元的信息结构
@@ -122,18 +114,76 @@ namespace configCenter {
     }
 
     /**
+     * 绘制形状的标签
+     */
+    export const DRAW_SHAPE = 2**0;
+
+    /**
+     * 绘制碰撞盒的标签
+     */
+    export const DRAW_AABB = 2**1;
+
+    /**
+     * 绘制约束的标签
+     */
+    export const DRAW_JOINTS = 2**2
+
+    /**
+     * 绘制变换的标签
+     */
+    export const DRAW_CENTER_OF_MASSES = 2**3;
+
+    /**
      * 画面元素的集合
      */
     export const checkBoxData: CheckBoxRec[] = [
         {
-            info: `Shape`,
+            info: `Shapes`,
             tag: DRAW_SHAPE
         },
         {
-            info: `AABB`,
+            info: `AABBs`,
             tag: DRAW_AABB
+        },
+        {
+            info: `Joints`,
+            tag: DRAW_JOINTS
+        },
+        {
+            info: `Center of Masses`,
+            tag: DRAW_CENTER_OF_MASSES
         }
     ]
+
+    /**
+     * 变换的可视化信息
+     */
+    export const transformLen = 1
+
+    /**
+     * 约束的线的宽度
+     */
+    export const jointLineWitdh = 10;
+
+    /**
+     * 4 份之一的线宽
+     */
+    export const hhJointLineWidth = jointLineWitdh / 2 * (3 / 4);
+
+    /**
+     * 原点
+     */
+    export const posO = new b2Vec2(0, 0);
+
+    /**
+     * x 坐标
+     */
+    export const xAxis = new b2Vec2(transformLen, 0);
+
+    /**
+     * y 坐标
+     */
+    export const yAxis = new b2Vec2(0, transformLen);
 
     /**
      * 颜色
@@ -143,14 +193,24 @@ namespace configCenter {
             /**
              * 外轮廓
              */
-            outline: new cc.Color(255, 255, 255, 255),
+            outline: new cc.Color(100, 255, 100, 255),
             /**
              * 身体
              */
-            body: new cc.Color(255, 255, 255, 100)
+            body: new cc.Color(100, 255, 100, 100)
         },
 
-        aabb: new cc.Color(0,0,255, 255)
+        aabb: new cc.Color(0,0,255, 255),
+
+        joint: {
+            area: new cc.Color(100, 100, 100, 255),
+            dot: new cc.Color(255, 255, 255, 255),
+        },
+
+        transform: {
+            xColor: new cc.Color(255,0,0,255),
+            yColor: new cc.Color(0,255,0,255)
+        }
     }
 
     /**
