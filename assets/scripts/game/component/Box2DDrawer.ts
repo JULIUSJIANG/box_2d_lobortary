@@ -7,7 +7,7 @@
 
 import EventerNoArgs from "../../frame/basic/EventerNoArgs";
 import b2Extend from "../../lib/b2_extend/B2Extend";
-import { b2AABB, b2Body, b2BodyDef, b2Color, b2Draw, b2DrawFlags, b2Fixture, b2Joint, b2Mat33, b2PolygonShape, b2Transform, b2Vec2, b2Vec3, b2World, b2_pi } from "../../lib/box2d_ts/Box2D";
+import { b2AABB, b2Body, b2BodyDef, b2Color, b2Draw, b2DrawFlags, b2Fixture, b2Joint, b2Mat33, b2PolygonShape, b2Transform, b2Vec2, b2Vec3, b2World, b2WorldManifold, b2_pi } from "../../lib/box2d_ts/Box2D";
 import configCenter from "../ConfigCenter";
 import CheckBox from "./CheckBox";
 import dataCenter from "../DataCenter";
@@ -112,9 +112,22 @@ export default class Box2DDrawer extends cc.Component {
                     };
                 };
                 
-                if (this._currDrawTag & configCenter.DRAW_SHAPE) {
+                if (this._currDrawTag & configCenter.DRAW_SHAPES) {
                     this.DrawShape(f, mat);
                 };
+            };
+        };
+
+        let b2wm = new b2WorldManifold();
+        if (this._currDrawTag & configCenter.DRAW_CONTACT_POINTS) {
+            this.graphics.fillColor = configCenter.color.contactPoint.dot;
+            for (let b2c = this._b2w.GetContactManager().m_contactList; b2c; b2c = b2c.GetNext()) {
+                b2c.GetWorldManifold(b2wm);
+                b2wm.points.forEach(( po ) => {
+                    this.ArcCycle(po.x, po.y, configCenter.contactPointRadius);
+                    this.graphics.close();
+                    this.graphics.fill();
+                });
             };
         };
     }

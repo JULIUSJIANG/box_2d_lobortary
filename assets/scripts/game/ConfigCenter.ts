@@ -116,22 +116,39 @@ namespace configCenter {
     /**
      * 绘制形状的标签
      */
-    export const DRAW_SHAPE = 2**0;
+    export const DRAW_SHAPES = 2**0;
+
+    /**
+     * 绘制粒子
+     */
+    export const DRAW_PARTICLES = 2**1;
+
+    /**
+     * 绘制约束
+     */
+    export const DRAW_JOINTS = 2**2;
 
     /**
      * 绘制碰撞盒的标签
      */
-    export const DRAW_AABB = 2**1;
+    export const DRAW_AABB = 2**3;
 
-    /**
-     * 绘制约束的标签
-     */
-    export const DRAW_JOINTS = 2**2
+    export const DRAW_CONTACT_POINTS = 2**4;
+
+    export const DRAW_CONTACT_NORMALS = 2**5;
+
+    export const DRAW_CONTACT_IMPULSES = 2**6;
+
+    export const DRAW_FRICTION_IMPULSES = 2**7;
 
     /**
      * 绘制变换的标签
      */
-    export const DRAW_CENTER_OF_MASSES = 2**3;
+    export const DRAW_CENTER_OF_MASSES = 2**8;
+
+    export const DRAW_STATISTICS = 2**9;
+
+    export const DRAW_PROFILE = 2**10;
 
     /**
      * 画面元素的集合
@@ -139,19 +156,47 @@ namespace configCenter {
     export const checkBoxData: CheckBoxRec[] = [
         {
             info: `Shapes`,
-            tag: DRAW_SHAPE
+            tag: DRAW_SHAPES
         },
         {
-            info: `AABBs`,
-            tag: DRAW_AABB
+            info: `Particles`,
+            tag: DRAW_PARTICLES
         },
         {
             info: `Joints`,
             tag: DRAW_JOINTS
         },
         {
+            info: `AABBs`,
+            tag: DRAW_AABB
+        },
+        {
+            info: `Contact Points`,
+            tag: DRAW_CONTACT_POINTS
+        },
+        {
+            info: `Contact Normals`,
+            tag: DRAW_CONTACT_NORMALS
+        },
+        {
+            info: `Contact Impulses`,
+            tag: DRAW_CONTACT_IMPULSES
+        },
+        {
+            info: `Friction Impulses`,
+            tag: DRAW_FRICTION_IMPULSES
+        },
+        {
             info: `Center of Masses`,
             tag: DRAW_CENTER_OF_MASSES
+        },
+        {
+            info: `Statistics`,
+            tag: DRAW_STATISTICS
+        },
+        {
+            info: `Profile`,
+            tag: DRAW_PROFILE
         }
     ]
 
@@ -186,9 +231,17 @@ namespace configCenter {
     export const yAxis = new b2Vec2(0, transformLen);
 
     /**
+     * 碰撞点半径
+     */
+    export const contactPointRadius = 5;
+
+    /**
      * 颜色
      */
     export const color = {
+        /**
+         * 形状
+         */
         shape: {
             /**
              * 外轮廓
@@ -200,16 +253,44 @@ namespace configCenter {
             body: new cc.Color(100, 255, 100, 100)
         },
 
+        /**
+         * 包围盒线条颜色
+         */
         aabb: new cc.Color(0,0,255, 255),
 
+        /**
+         * 约束
+         */
         joint: {
+            /**
+             * 区域颜色
+             */
             area: new cc.Color(100, 100, 100, 255),
+            /**
+             * 关节点颜色
+             */
             dot: new cc.Color(255, 255, 255, 255),
         },
 
+        /**
+         * 变换
+         */
         transform: {
+            /**
+             * x 坐标
+             */
             xColor: new cc.Color(255,0,0,255),
+            /**
+             * y 坐标
+             */
             yColor: new cc.Color(0,255,0,255)
+        },
+
+        /**
+         * 碰撞点的颜色
+         */
+        contactPoint: {
+            dot: new cc.Color(255, 255, 100, 100)
         }
     }
 
