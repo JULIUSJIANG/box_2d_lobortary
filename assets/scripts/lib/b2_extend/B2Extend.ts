@@ -1,4 +1,4 @@
-import { b2Mat33, b2PolygonShape, b2Shape, b2ShapeType, b2Transform, b2Vec3 } from "../box2d_ts/Box2D";
+import { b2CircleShape, b2Mat33, b2PolygonShape, b2Shape, b2ShapeType, b2Transform, b2Vec3 } from "../box2d_ts/Box2D";
 
 namespace b2Extend {
     /**
@@ -8,6 +8,17 @@ namespace b2Extend {
     export function GetPolygonShape (shape: b2Shape): b2PolygonShape {
         if (shape.GetType() == b2ShapeType.e_polygonShape) {
             return shape as b2PolygonShape;
+        };
+        return null;
+    }
+
+    /**
+     * 获取身上的圆形
+     * @param shape 
+     */
+    export function GetCircleShape (shape: b2Shape): b2CircleShape {
+        if (shape.GetType() == b2ShapeType.e_circleShape) {
+            return shape as b2CircleShape;
         };
         return null;
     }

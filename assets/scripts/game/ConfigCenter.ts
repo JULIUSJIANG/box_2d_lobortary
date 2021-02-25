@@ -1,5 +1,7 @@
 import { b2Vec2, b2World } from "../lib/box2d_ts/Box2D";
+import B2ExamSparky from "./view/b2_example/B2ExamSparky";
 import B2ExamTumber from "./view/b2_example/B2ExamTumber";
+import ExamContext from "./view/ExamContext";
 
 namespace configCenter {
      
@@ -8,7 +10,7 @@ namespace configCenter {
      */
     export interface BtnRec {
         info: string;
-        b2WorldCreator: () => b2World
+        b2WorldCreator: () => ExamContext
     }
 
     /**
@@ -17,7 +19,7 @@ namespace configCenter {
     export const examArr: BtnRec[] = [
         {
             info: `Sparky`,
-            b2WorldCreator: null
+            b2WorldCreator: B2ExamSparky
         },
         {
             info: `Shape Cast`,
@@ -263,9 +265,15 @@ namespace configCenter {
          */
         joint: {
             /**
-             * 区域颜色
+             * 起始颜色
              */
-            area: new cc.Color(100, 100, 100, 255),
+            areaBegin: new cc.Color(150, 150, 150, 255),
+
+            /**
+             * 结束颜色
+             */
+            areaEnd: new cc.Color(75, 75, 75, 255),
+
             /**
              * 关节点颜色
              */
@@ -291,6 +299,20 @@ namespace configCenter {
          */
         contactPoint: {
             dot: new cc.Color(255, 255, 100, 100)
+        },
+
+        /**
+         * 粒子颜色
+         */
+        particle: {
+            /**
+             * 填充色
+             */
+            fill: new cc.Color(100, 100, 255, 100),
+            /**
+             * 描边色
+             */
+            stroke: new cc.Color(100, 100, 255, 255)
         }
     }
 

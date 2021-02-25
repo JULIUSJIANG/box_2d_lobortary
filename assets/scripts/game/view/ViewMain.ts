@@ -14,6 +14,7 @@ import FrameMsClock from '../../frame/basic/FrameMsClock';
 import Box2DDrawer from '../component/Box2DDrawer';
 import dataCenter from '../DataCenter';
 import configCenter from '../ConfigCenter';
+import ExamContext from './ExamContext';
 const {ccclass, property} = cc._decorator;
 
 @ccclass
@@ -28,7 +29,7 @@ export default class ViewMain extends MgrViewNoArgsViewBasic {
     private radioBtnPrefab: cc.Prefab = null;
 
     public onLoad () {
-        let m_world: b2World;
+        let m_world: ExamContext;
         this.radioContainer.removeAllChildren();
         let evter = new EventerWithArgs<number>();
         let rbList: RadioBtn[] = [];
@@ -49,7 +50,7 @@ export default class ViewMain extends MgrViewNoArgsViewBasic {
             // 切换世界
             m_world = current.b2WorldCreator ? current.b2WorldCreator() : null;
             // 进行画面绘制
-            Box2DDrawer.inst.DrawB2World(m_world);
+            Box2DDrawer.inst.DrawB2World(m_world && m_world._b2w);
             rbList.forEach(( rb ) => {
                 rb.Refresh();
             });
@@ -63,8 +64,8 @@ export default class ViewMain extends MgrViewNoArgsViewBasic {
                 return;
             };
             let stepTme = 16 < passedMs ? 0.016 : passedMs / 1000;
-            m_world.Step(stepTme, 1, 1, 1);
-            Box2DDrawer.inst.DrawB2World(m_world);
+            m_world.evterUpdate.Call(stepTme);
+            Box2DDrawer.inst.DrawB2World(m_world._b2w);
         });
         frameMsClock.Resume();
     }

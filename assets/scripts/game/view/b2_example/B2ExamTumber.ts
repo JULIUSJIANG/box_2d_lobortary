@@ -6,6 +6,7 @@ import ViewRegistMsg from '../../../frame/view/ViewRegistMsg';
 import b2Extend from "../../../lib/b2_extend/B2Extend";
 import { b2BodyDef, b2BodyType, b2DrawFlags, b2JointType, b2Mat33, b2PolygonShape, b2RevoluteJointDef, b2Vec2, b2Vec3, b2World, b2_180_over_pi, b2_pi } from "../../../lib/box2d_ts/Box2D";
 import Box2DDrawer from "../../component/Box2DDrawer";
+import ExamContext from "../ExamContext";
 
 /**
  * 箱子的尺寸
@@ -19,7 +20,7 @@ const BOX_COUNT = 100;
 const B2ExamTumber = () => {
     const b2grav = {
         x: 0,
-        y: -1
+        y: -10
     };
     const m_world = new b2World(b2grav);
     
@@ -64,7 +65,7 @@ const B2ExamTumber = () => {
         body.CreateFixture(shape, 1.0);
     };
 
-    return m_world;
+    return new ExamContext(m_world);
 }
 
 export default B2ExamTumber;

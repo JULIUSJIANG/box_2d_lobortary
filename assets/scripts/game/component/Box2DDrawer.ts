@@ -7,7 +7,7 @@
 
 import EventerNoArgs from "../../frame/basic/EventerNoArgs";
 import b2Extend from "../../lib/b2_extend/B2Extend";
-import { b2AABB, b2Body, b2BodyDef, b2Color, b2Draw, b2DrawFlags, b2Fixture, b2Joint, b2Mat33, b2PolygonShape, b2Transform, b2Vec2, b2Vec3, b2World, b2WorldManifold, b2_pi } from "../../lib/box2d_ts/Box2D";
+import { b2AABB, b2Body, b2BodyDef, b2CircleShape, b2Color, b2Draw, b2DrawFlags, b2Fixture, b2Joint, b2Mat33, b2PolygonShape, b2Transform, b2Vec2, b2Vec3, b2World, b2WorldManifold, b2_pi } from "../../lib/box2d_ts/Box2D";
 import configCenter from "../ConfigCenter";
 import CheckBox from "./CheckBox";
 import dataCenter from "../DataCenter";
@@ -118,8 +118,8 @@ export default class Box2DDrawer extends cc.Component {
             };
         };
 
-        let b2wm = new b2WorldManifold();
         if (this._currDrawTag & configCenter.DRAW_CONTACT_POINTS) {
+            let b2wm = new b2WorldManifold();
             this.graphics.fillColor = configCenter.color.contactPoint.dot;
             for (let b2c = this._b2w.GetContactManager().m_contactList; b2c; b2c = b2c.GetNext()) {
                 b2c.GetWorldManifold(b2wm);
@@ -130,6 +130,19 @@ export default class Box2DDrawer extends cc.Component {
                 });
             };
         };
+
+        if (this._currDrawTag & configCenter.DRAW_PARTICLES) {
+            for (let b2p = this._b2w.GetParticleSystemList(); b2p; b2p = b2p.GetNext()) {
+                // 读取半径
+                let radius = b2p.GetRadius();
+                let pCount = b2p.GetParticleCount();
+                let pBuff = b2p.GetPositionBuffer();
+                for (let i = 0; i < pCount; i++) {
+                    let pos = pBuff[i];
+                    this.DrawSolidCircleV0(pos.x, pos.y, radius * configCenter.b2ShapeScale, configCenter.color.particle.fill, configCenter.color.particle.stroke);
+                };
+            };
+        };
     }
 
     /**
@@ -138,7 +151,7 @@ export default class Box2DDrawer extends cc.Component {
      */
     private DrawJoint (b2j: b2Joint) {
         this.graphics.fillColor = configCenter.color.joint.dot;
-        this.graphics.strokeColor = configCenter.color.joint.area;
+        this.graphics.strokeColor = configCenter.color.joint.areaBegin;
         this.graphics.lineCap = cc.Graphics.LineCap.ROUND;
         this.graphics.lineWidth = configCenter.jointLineWitdh;
 
@@ -154,6 +167,7 @@ export default class Box2DDrawer extends cc.Component {
         this.GraphicsLineTo(this._tempPos.x, this._tempPos.y);
 
         this.graphics.stroke();
+        this.graphics.strokeColor = configCenter.color.joint.areaEnd;
         this.GraphicsMoveTo(this._tempPos.x, this._tempPos.y);
 
         let bodyB = b2j.GetBodyB();
@@ -165,7 +179,6 @@ export default class Box2DDrawer extends cc.Component {
         this.graphics.stroke();
 
         // 连接点
-
         this.Transform(configCenter.posO, matA);
         this.ArcCycle(this._tempPos.x, this._tempPos.y, configCenter.hhJointLineWidth)
         this.graphics.fill();
@@ -226,6 +239,8 @@ export default class Box2DDrawer extends cc.Component {
         const shape = fixt.GetShape();
         const poly = b2Extend.GetPolygonShape(shape);
         this.DrawPolygonShape(poly, mat);
+        const circle = b2Extend.GetCircleShape(shape);
+        this.DrawCircleShape(circle, mat);
     }
 
     /**
@@ -237,7 +252,19 @@ export default class Box2DDrawer extends cc.Component {
         if (poly == null) {
             return;
         };
-        this.DrawSolidPolygon(poly.m_vertices, poly.m_count, mat);
+        this.DrawSolidPolygon(poly.m_vertices, poly.m_count, mat, configCenter.color.shape.body, configCenter.color.shape.outline);
+    }
+
+    /**
+     * 绘制圆
+     * @param circle 
+     * @param mat 
+     */
+    private DrawCircleShape (circle: b2CircleShape, mat: b2Mat33) {
+        if (circle == null) {
+            return;
+        };
+        this.DrawSolidCircle(circle.m_radius, mat, configCenter.color.shape.body, configCenter.color.shape.outline);
     }
 
     /**
@@ -263,18 +290,18 @@ export default class Box2DDrawer extends cc.Component {
         this._tempPos.z = b2Vec3.z;
 
         b2Mat33.MulM33V3(mat, this._tempPos, this._tempPos);
-
         return this._tempPos;
     }
 
     /**
-     * 画出实体
+     * 画出多边形
      * @param vArr 
      * @param vCount 
-     * @param color 
      * @param mat 
+     * @param fillColor 
+     * @param outlineColor 
      */
-    private DrawSolidPolygon (vArr: b2Vec2[], vCount: number, mat: b2Mat33) {
+    private DrawSolidPolygon (vArr: b2Vec2[], vCount: number, mat: b2Mat33, fillColor: cc.Color, outlineColor: cc.Color) {
         this.Transform(vArr[0], mat);
         this.GraphicsMoveTo(this._tempPos.x, this._tempPos.y);
         for (let i = 1; i < vCount; i++) {
@@ -282,9 +309,34 @@ export default class Box2DDrawer extends cc.Component {
             this.GraphicsLineTo(this._tempPos.x, this._tempPos.y);
         };
         this.graphics.close();
-        this.graphics.fillColor = configCenter.color.shape.body;
+        this.graphics.fillColor = fillColor;
         this.graphics.fill();
-        this.graphics.strokeColor = configCenter.color.shape.outline;
+        this.graphics.strokeColor = outlineColor;
+        this.graphics.lineWidth = 2;
+        this.graphics.stroke();
+    }
+
+    /**
+     * 画出圆圈
+     * @param pos 
+     * @param radius 
+     * @param mat 
+     * @param fillColor 
+     * @param outlineColor 
+     */
+    private DrawSolidCircle (radius: number, mat: b2Mat33, fillColor: cc.Color, outlineColor: cc.Color) {
+        radius *= configCenter.b2ShapeScale;
+        this.Transform(configCenter.posO, mat);
+        this.ArcCycle(this._tempPos.x, this._tempPos.y, radius);
+        this.DrawSolidCircleV0(this._tempPos.x, this._tempPos.y, radius, fillColor, outlineColor);
+    }
+
+    private DrawSolidCircleV0 (x: number, y: number, radius: number, fillColor: cc.Color, outlineColor: cc.Color) {
+        this.ArcCycle(x, y, radius);
+        this.graphics.close();
+        this.graphics.fillColor = fillColor;
+        this.graphics.fill();
+        this.graphics.strokeColor = outlineColor;
         this.graphics.lineWidth = 2;
         this.graphics.stroke();
     }
