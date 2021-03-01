@@ -85,6 +85,7 @@ const B2ExamSparky = () => {
         // 设置碰撞的监听
         m_world.SetContactListener({
             BeginContact: (contact: b2Contact) => {
+                // 记录下所有的碰撞点
                 const userA = contact.GetFixtureA().GetUserData();
                 const userB = contact.GetFixtureB().GetUserData();
                 if (userA && userA.spark || userB && userB.spark) {
@@ -125,8 +126,7 @@ const B2ExamSparky = () => {
                 const pd = new b2ParticleGroupDef();
                 pd.flags = b2ParticleFlag.b2_powderParticle;
                 pd.shape = shape;
-                pd.color.Copy(new b2Color(1,1,1));
-                let m_pg = m_particleSystem.CreateParticleGroup(pd);
+                m_particleSystem.CreateParticleGroup(pd);
                 m_contact = false; 
             };
         });

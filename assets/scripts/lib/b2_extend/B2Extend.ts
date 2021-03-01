@@ -1,6 +1,28 @@
-import { b2CircleShape, b2Mat33, b2PolygonShape, b2Shape, b2ShapeType, b2Transform, b2Vec3 } from "../box2d_ts/Box2D";
+import { b2ChainShape, b2CircleShape, b2EdgeShape, b2Mat33, b2PolygonShape, b2Shape, b2ShapeType, b2Transform, b2Vec3 } from "../box2d_ts/Box2D";
 
 namespace b2Extend {
+    /**
+     * 获取铰链
+     * @param shape 
+     */
+    export function GetChainShape (shape: b2Shape): b2ChainShape {
+        if (shape.GetType() == b2ShapeType.e_chainShape) {
+            return shape as b2ChainShape;
+        };
+        return;
+    }
+
+    /**
+     * 获取身上的线形
+     * @param shape 
+     */
+    export function GetEdgeShape (shape: b2Shape): b2EdgeShape {
+        if (shape.GetType() == b2ShapeType.e_edgeShape){
+            return shape as b2EdgeShape;
+        };
+        return;
+    }
+
     /**
      * 获取身上的多边形
      * @param shape 

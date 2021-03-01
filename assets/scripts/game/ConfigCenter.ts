@@ -1,4 +1,5 @@
 import { b2Vec2, b2World } from "../lib/box2d_ts/Box2D";
+import B2ExamCharacterCollision from "./view/b2_example/B2ExamCharacterCollision";
 import B2ExamSparky from "./view/b2_example/B2ExamSparky";
 import B2ExamTumber from "./view/b2_example/B2ExamTumber";
 import ExamContext from "./view/ExamContext";
@@ -12,6 +13,16 @@ namespace configCenter {
         info: string;
         b2WorldCreator: () => ExamContext
     }
+
+    /**
+     * 标准宽
+     */
+    export const STANDARD_WIDTH = 2;
+
+    /**
+     * 标准半径
+     */
+    export const DOT_RADIUS = 2;
 
     /**
      * 示例的合集
@@ -31,7 +42,7 @@ namespace configCenter {
         },
         {
             info: `Character Collision`,
-            b2WorldCreator: null
+            b2WorldCreator: B2ExamCharacterCollision
         },
         {
             info: `Tiles`,

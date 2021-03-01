@@ -7,7 +7,7 @@
 
 import EventerNoArgs from "../../frame/basic/EventerNoArgs";
 import b2Extend from "../../lib/b2_extend/B2Extend";
-import { b2AABB, b2Body, b2BodyDef, b2CircleShape, b2Color, b2Draw, b2DrawFlags, b2Fixture, b2Joint, b2Mat33, b2PolygonShape, b2Transform, b2Vec2, b2Vec3, b2World, b2WorldManifold, b2_pi } from "../../lib/box2d_ts/Box2D";
+import { b2AABB, b2Body, b2BodyDef, b2ChainShape, b2CircleShape, b2Color, b2Draw, b2DrawFlags, b2EdgeShape, b2Fixture, b2Joint, b2Mat33, b2PolygonShape, b2Transform, b2Vec2, b2Vec3, b2World, b2WorldManifold, b2_pi } from "../../lib/box2d_ts/Box2D";
 import configCenter from "../ConfigCenter";
 import CheckBox from "./CheckBox";
 import dataCenter from "../DataCenter";
@@ -124,7 +124,7 @@ export default class Box2DDrawer extends cc.Component {
             for (let b2c = this._b2w.GetContactManager().m_contactList; b2c; b2c = b2c.GetNext()) {
                 b2c.GetWorldManifold(b2wm);
                 b2wm.points.forEach(( po ) => {
-                    this.ArcCycle(po.x, po.y, configCenter.contactPointRadius);
+                    this.ArcCyclePixel(po.x, po.y, configCenter.contactPointRadius);
                     this.graphics.close();
                     this.graphics.fill();
                 });
@@ -139,7 +139,7 @@ export default class Box2DDrawer extends cc.Component {
                 let pBuff = b2p.GetPositionBuffer();
                 for (let i = 0; i < pCount; i++) {
                     let pos = pBuff[i];
-                    this.DrawSolidCircleV0(pos.x, pos.y, radius * configCenter.b2ShapeScale, configCenter.color.particle.fill, configCenter.color.particle.stroke);
+                    this.DrawSolidCircleMeterV1(pos.x, pos.y, radius, configCenter.color.particle.fill, configCenter.color.particle.stroke);
                 };
             };
         };
@@ -160,36 +160,36 @@ export default class Box2DDrawer extends cc.Component {
         let matA = b2Extend.GetTransMat(transformA);
 
         this.Transform(configCenter.posO, matA);
-        this.GraphicsMoveTo(this._tempPos.x, this._tempPos.y);
+        this.GraphicsMoveToMeter(this._tempPos.x, this._tempPos.y);
 
         b2j.GetAnchorA(this._tempPos);
         this.TransformForV3(this._tempPos, matA);
-        this.GraphicsLineTo(this._tempPos.x, this._tempPos.y);
+        this.GraphicsLineToMeter(this._tempPos.x, this._tempPos.y);
 
         this.graphics.stroke();
         this.graphics.strokeColor = configCenter.color.joint.areaEnd;
-        this.GraphicsMoveTo(this._tempPos.x, this._tempPos.y);
+        this.GraphicsMoveToMeter(this._tempPos.x, this._tempPos.y);
 
         let bodyB = b2j.GetBodyB();
         let transformB = bodyB.GetTransform();
         let matB = b2Extend.GetTransMat(transformB);
 
         this.Transform(configCenter.posO, matB);
-        this.GraphicsLineTo(this._tempPos.x, this._tempPos.y);
+        this.GraphicsLineToMeter(this._tempPos.x, this._tempPos.y);
         this.graphics.stroke();
 
         // 连接点
         this.Transform(configCenter.posO, matA);
-        this.ArcCycle(this._tempPos.x, this._tempPos.y, configCenter.hhJointLineWidth)
+        this.ArcCyclePixel(this._tempPos.x, this._tempPos.y, configCenter.hhJointLineWidth)
         this.graphics.fill();
 
         b2j.GetAnchorA(this._tempPos);
         this.TransformForV3(this._tempPos, matA);
-        this.ArcCycle(this._tempPos.x, this._tempPos.y, configCenter.hhJointLineWidth)
+        this.ArcCyclePixel(this._tempPos.x, this._tempPos.y, configCenter.hhJointLineWidth)
         this.graphics.fill();
 
         this.Transform(configCenter.posO, matB);
-        this.ArcCycle(this._tempPos.x, this._tempPos.y, configCenter.hhJointLineWidth)
+        this.ArcCyclePixel(this._tempPos.x, this._tempPos.y, configCenter.hhJointLineWidth)
         this.graphics.fill();
     }
 
@@ -199,19 +199,19 @@ export default class Box2DDrawer extends cc.Component {
      */
     private DrawTransform (mat: b2Mat33) {
         let posO = this.Transform(configCenter.posO, mat);
-        this.GraphicsMoveTo(posO.x, posO.y);
+        this.GraphicsMoveToMeter(posO.x, posO.y);
         let xAxis = this.Transform(configCenter.xAxis, mat);
-        this.GraphicsLineTo(xAxis.x, xAxis.y);
+        this.GraphicsLineToMeter(xAxis.x, xAxis.y);
         this.graphics.strokeColor = configCenter.color.transform.xColor;
-        this.graphics.lineWidth = 2;
+        this.graphics.lineWidth = configCenter.STANDARD_WIDTH;
         this.graphics.stroke();
 
         posO = this.Transform(configCenter.posO, mat);
-        this.GraphicsMoveTo(posO.x, posO.y);
+        this.GraphicsMoveToMeter(posO.x, posO.y);
         let yAxis = this.Transform(configCenter.yAxis, mat);
-        this.GraphicsLineTo(yAxis.x, yAxis.y);
+        this.GraphicsLineToMeter(yAxis.x, yAxis.y);
         this.graphics.strokeColor = configCenter.color.transform.yColor;
-        this.graphics.lineWidth = 2;
+        this.graphics.lineWidth = configCenter.STANDARD_WIDTH;
         this.graphics.stroke();
     }
 
@@ -220,13 +220,13 @@ export default class Box2DDrawer extends cc.Component {
      * @param aabb 
      */
     private DrawAABB (aabb: b2AABB) {
-        this.GraphicsMoveTo(aabb.lowerBound.x, aabb.lowerBound.y);
-        this.GraphicsLineTo(aabb.upperBound.x, aabb.lowerBound.y);
-        this.GraphicsLineTo(aabb.upperBound.x, aabb.upperBound.y);
-        this.GraphicsLineTo(aabb.lowerBound.x, aabb.upperBound.y);
-        this.GraphicsLineTo(aabb.lowerBound.x, aabb.lowerBound.y);
+        this.GraphicsMoveToMeter(aabb.lowerBound.x, aabb.lowerBound.y);
+        this.GraphicsLineToMeter(aabb.upperBound.x, aabb.lowerBound.y);
+        this.GraphicsLineToMeter(aabb.upperBound.x, aabb.upperBound.y);
+        this.GraphicsLineToMeter(aabb.lowerBound.x, aabb.upperBound.y);
+        this.GraphicsLineToMeter(aabb.lowerBound.x, aabb.lowerBound.y);
         this.graphics.strokeColor = configCenter.color.aabb;
-        this.graphics.lineWidth = 2;
+        this.graphics.lineWidth = configCenter.STANDARD_WIDTH;
         this.graphics.stroke();
     }
 
@@ -241,6 +241,43 @@ export default class Box2DDrawer extends cc.Component {
         this.DrawPolygonShape(poly, mat);
         const circle = b2Extend.GetCircleShape(shape);
         this.DrawCircleShape(circle, mat);
+        const edge = b2Extend.GetEdgeShape(shape);
+        this.DrawEdgeShape(edge, mat);
+        const chain = b2Extend.GetChainShape(shape);
+        this.DrawChainShape(chain, mat);
+    }
+
+    /**
+     * 绘制铰链
+     * @param cs 
+     * @param mat 
+     */
+    private DrawChainShape (cs: b2ChainShape, mat: b2Mat33) {
+        if (cs == null) {
+            return;
+        };
+        const count = cs.m_count;
+        const vertices = cs.m_vertices;
+        let targetVertices = vertices.slice(0, count);
+        if (cs.m_hasPrevVertex) {
+            targetVertices.unshift(cs.m_prevVertex);
+        };
+        if (cs.m_hasNextVertex) {
+            targetVertices.push(cs.m_nextVertex);
+        };
+        this.DrawSegment(targetVertices, targetVertices.length, mat, configCenter.color.shape.outline);
+    }
+
+    /**
+     * 绘制轨迹形
+     * @param es 
+     * @param mat 
+     */
+    private DrawEdgeShape (es: b2EdgeShape, mat: b2Mat33) {
+        if (es == null) {
+            return;
+        };
+        this.DrawSegment([es.m_vertex1, es.m_vertex2], 2, mat, configCenter.color.shape.outline);
     }
 
     /**
@@ -252,7 +289,7 @@ export default class Box2DDrawer extends cc.Component {
         if (poly == null) {
             return;
         };
-        this.DrawSolidPolygon(poly.m_vertices, poly.m_count, mat, configCenter.color.shape.body, configCenter.color.shape.outline);
+        this.DrawSolidPolygonMeter(poly.m_vertices, poly.m_count, mat, configCenter.color.shape.body, configCenter.color.shape.outline);
     }
 
     /**
@@ -264,7 +301,7 @@ export default class Box2DDrawer extends cc.Component {
         if (circle == null) {
             return;
         };
-        this.DrawSolidCircle(circle.m_radius, mat, configCenter.color.shape.body, configCenter.color.shape.outline);
+        this.DrawSolidCircleMeterV2(circle.m_radius, mat, configCenter.color.shape.body, configCenter.color.shape.outline);
     }
 
     /**
@@ -284,6 +321,11 @@ export default class Box2DDrawer extends cc.Component {
         return this.TransformForV3(this._tempPos, mat);
     }
 
+    /**
+     * 变换
+     * @param b2Vec3 
+     * @param mat 
+     */
     private TransformForV3 (b2Vec3: b2Vec3, mat: b2Mat33) {
         this._tempPos.x = b2Vec3.x;
         this._tempPos.y = b2Vec3.y;
@@ -301,19 +343,45 @@ export default class Box2DDrawer extends cc.Component {
      * @param fillColor 
      * @param outlineColor 
      */
-    private DrawSolidPolygon (vArr: b2Vec2[], vCount: number, mat: b2Mat33, fillColor: cc.Color, outlineColor: cc.Color) {
+    private DrawSolidPolygonMeter (vArr: b2Vec2[], vCount: number, mat: b2Mat33, fillColor: cc.Color, outlineColor: cc.Color) {
         this.Transform(vArr[0], mat);
-        this.GraphicsMoveTo(this._tempPos.x, this._tempPos.y);
+        this.GraphicsMoveToMeter(this._tempPos.x, this._tempPos.y);
         for (let i = 1; i < vCount; i++) {
             this.Transform(vArr[i], mat);
-            this.GraphicsLineTo(this._tempPos.x, this._tempPos.y);
+            this.GraphicsLineToMeter(this._tempPos.x, this._tempPos.y);
         };
         this.graphics.close();
         this.graphics.fillColor = fillColor;
         this.graphics.fill();
         this.graphics.strokeColor = outlineColor;
-        this.graphics.lineWidth = 2;
+        this.graphics.lineWidth = configCenter.STANDARD_WIDTH;
         this.graphics.stroke();
+    }
+
+    /**
+     * 画出片段
+     * @param vArr 
+     * @param vCount 
+     * @param mat 
+     * @param outlineColor 
+     */
+    private DrawSegment (vArr: b2Vec2[], vCount: number, mat: b2Mat33, outlineColor: cc.Color) {
+        this.Transform(vArr[0], mat);
+        this.GraphicsMoveToMeter(this._tempPos.x, this._tempPos.y);
+        for (let i = 1; i < vCount; i++) {
+            this.Transform(vArr[i], mat);
+            this.GraphicsLineToMeter(this._tempPos.x, this._tempPos.y);
+        };
+        this.graphics.lineWidth = configCenter.STANDARD_WIDTH;
+        this.graphics.strokeColor = outlineColor;
+        this.graphics.fillColor = outlineColor;
+        this.graphics.stroke();
+
+        for (let i = 0; i < vCount; i++) {
+            this.Transform(vArr[i], mat);
+            this.ArcCyclePixel(this._tempPos.x, this._tempPos.y, configCenter.DOT_RADIUS);
+            this.graphics.fill();
+        };
     }
 
     /**
@@ -324,20 +392,26 @@ export default class Box2DDrawer extends cc.Component {
      * @param fillColor 
      * @param outlineColor 
      */
-    private DrawSolidCircle (radius: number, mat: b2Mat33, fillColor: cc.Color, outlineColor: cc.Color) {
-        radius *= configCenter.b2ShapeScale;
+    private DrawSolidCircleMeterV2 (radius: number, mat: b2Mat33, fillColor: cc.Color, outlineColor: cc.Color) {
         this.Transform(configCenter.posO, mat);
-        this.ArcCycle(this._tempPos.x, this._tempPos.y, radius);
-        this.DrawSolidCircleV0(this._tempPos.x, this._tempPos.y, radius, fillColor, outlineColor);
+        this.DrawSolidCircleMeterV1(this._tempPos.x, this._tempPos.y, radius, fillColor, outlineColor);
     }
 
-    private DrawSolidCircleV0 (x: number, y: number, radius: number, fillColor: cc.Color, outlineColor: cc.Color) {
-        this.ArcCycle(x, y, radius);
+    /**
+     * 画出圆圈
+     * @param x 
+     * @param y 
+     * @param radius 
+     * @param fillColor 
+     * @param outlineColor 
+     */
+    private DrawSolidCircleMeterV1 (x: number, y: number, radius: number, fillColor: cc.Color, outlineColor: cc.Color) {
+        this.ArcCycleMeter(x, y, radius);
         this.graphics.close();
         this.graphics.fillColor = fillColor;
         this.graphics.fill();
         this.graphics.strokeColor = outlineColor;
-        this.graphics.lineWidth = 2;
+        this.graphics.lineWidth = configCenter.STANDARD_WIDTH;
         this.graphics.stroke();
     }
 
@@ -347,7 +421,17 @@ export default class Box2DDrawer extends cc.Component {
      * @param y 
      * @param radius 
      */
-    private ArcCycle (x: number, y: number, radius: number) {
+    private ArcCycleMeter (x: number, y: number, radius: number) {
+        this.graphics.arc(x * configCenter.b2ShapeScale, y * configCenter.b2ShapeScale, radius * configCenter.b2ShapeScale, 0, 360, true);
+    }
+
+    /**
+     * 画圆
+     * @param x 
+     * @param y 
+     * @param radius 
+     */
+    private ArcCyclePixel (x: number, y: number, radius: number) {
         this.graphics.arc(x * configCenter.b2ShapeScale, y * configCenter.b2ShapeScale, radius, 0, 360, true);
     }
 
@@ -356,7 +440,7 @@ export default class Box2DDrawer extends cc.Component {
      * @param x 
      * @param y 
      */
-    private GraphicsMoveTo (x: number, y: number) {
+    private GraphicsMoveToMeter (x: number, y: number) {
         this.graphics.moveTo(x * configCenter.b2ShapeScale, y * configCenter.b2ShapeScale);
     }
 
@@ -365,7 +449,7 @@ export default class Box2DDrawer extends cc.Component {
      * @param x 
      * @param y 
      */
-    private GraphicsLineTo (x: number, y: number) {
+    private GraphicsLineToMeter (x: number, y: number) {
         this.graphics.lineTo(x * configCenter.b2ShapeScale, y * configCenter.b2ShapeScale);
     }
 }
