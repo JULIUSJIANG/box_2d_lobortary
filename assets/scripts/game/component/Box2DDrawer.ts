@@ -151,7 +151,7 @@ export default class Box2DDrawer extends cc.Component {
      */
     private DrawJoint (b2j: b2Joint) {
         this.graphics.fillColor = configCenter.color.joint.dot;
-        this.graphics.strokeColor = configCenter.color.joint.areaBegin;
+        
         this.graphics.lineCap = cc.Graphics.LineCap.ROUND;
         this.graphics.lineWidth = configCenter.jointLineWitdh;
 
@@ -159,23 +159,27 @@ export default class Box2DDrawer extends cc.Component {
         let transformA = bodyA.GetTransform();
         let matA = b2Extend.GetTransMat(transformA);
 
-        this.Transform(configCenter.posO, matA);
-        this.GraphicsMoveToMeter(this._tempPos.x, this._tempPos.y);
-
-        b2j.GetAnchorA(this._tempPos);
-        this.TransformForV3(this._tempPos, matA);
-        this.GraphicsLineToMeter(this._tempPos.x, this._tempPos.y);
-
-        this.graphics.stroke();
-        this.graphics.strokeColor = configCenter.color.joint.areaEnd;
-        this.GraphicsMoveToMeter(this._tempPos.x, this._tempPos.y);
-
         let bodyB = b2j.GetBodyB();
         let transformB = bodyB.GetTransform();
         let matB = b2Extend.GetTransMat(transformB);
 
+        // 绘线至 A 的锚点
+        this.Transform(configCenter.posO, matA);
+        this.GraphicsMoveToMeter(this._tempPos.x, this._tempPos.y);
+        b2j.GetAnchorA(this._tempPos);
+        this.GraphicsLineToMeter(this._tempPos.x, this._tempPos.y);
+
+        // 填色
+        this.graphics.strokeColor = configCenter.color.joint.areaBegin;
+        this.graphics.stroke();
+
+        // 绘线至 B 点
+        this.GraphicsMoveToMeter(this._tempPos.x, this._tempPos.y);
         this.Transform(configCenter.posO, matB);
         this.GraphicsLineToMeter(this._tempPos.x, this._tempPos.y);
+
+        // 填色
+        this.graphics.strokeColor = configCenter.color.joint.areaEnd;
         this.graphics.stroke();
 
         // 连接点
@@ -184,7 +188,6 @@ export default class Box2DDrawer extends cc.Component {
         this.graphics.fill();
 
         b2j.GetAnchorA(this._tempPos);
-        this.TransformForV3(this._tempPos, matA);
         this.ArcCyclePixel(this._tempPos.x, this._tempPos.y, configCenter.hhJointLineWidth)
         this.graphics.fill();
 

@@ -8,7 +8,7 @@ import ViewRegistMsg from '../../frame/view/ViewRegistMsg';
 import MgrViewNoArgsViewBasic from "../../frame/view/MgrViewNoArgsViewBasic";
 import RadioBtn from '../component/RadioBtn';
 import EventerWithArgs from '../../frame/basic/EventerWithArgs';
-import { b2BodyDef, b2BodyType, b2PolygonShape, b2World } from '../../lib/box2d_ts/Box2D';
+import { b2BodyDef, b2BodyType, b2PolygonShape, b2Vec2, b2World } from '../../lib/box2d_ts/Box2D';
 import B2ExamTumber from './b2_example/B2ExamTumber';
 import FrameMsClock from '../../frame/basic/FrameMsClock';
 import Box2DDrawer from '../component/Box2DDrawer';
@@ -27,6 +27,9 @@ export default class ViewMain extends MgrViewNoArgsViewBasic {
 
     @property(cc.Prefab)
     private radioBtnPrefab: cc.Prefab = null;
+
+    @property(cc.Node)
+    private touchNode: cc.Node = null;
 
     public onLoad () {
         let m_world: ExamContext;
@@ -50,7 +53,7 @@ export default class ViewMain extends MgrViewNoArgsViewBasic {
             // 切换世界
             m_world = current.b2WorldCreator ? current.b2WorldCreator() : null;
             // 进行画面绘制
-            Box2DDrawer.inst.DrawB2World(m_world && m_world._b2w);
+            Box2DDrawer.inst.DrawB2World(m_world && m_world.b2w);
             rbList.forEach(( rb ) => {
                 rb.Refresh();
             });
@@ -65,8 +68,49 @@ export default class ViewMain extends MgrViewNoArgsViewBasic {
             };
             let stepTme = 16 < passedMs ? 0.016 : passedMs / 1000;
             m_world.evterUpdate.Call(stepTme);
-            Box2DDrawer.inst.DrawB2World(m_world._b2w);
+            Box2DDrawer.inst.DrawB2World(m_world.b2w);
         });
         frameMsClock.Resume();
+
+        this.touchNode.on(cc.Node.EventType.TOUCH_START, (evt) => {
+            let x = evt.getLocationX();
+            let y = evt.getLocationY();
+            if (m_world) {
+                m_world.MouseDown(this.GetTouchNode(x ,y));
+            };
+        });
+        this.touchNode.on(cc.Node.EventType.TOUCH_MOVE, (evt) => {
+            let x = evt.getLocationX();
+            let y = evt.getLocationY();
+            if (m_world) {
+                m_world.MouseMove(this.GetTouchNode(x ,y));
+            };
+        });
+        this.touchNode.on(cc.Node.EventType.TOUCH_END, (evt) => {
+            let x = evt.getLocationX();
+            let y = evt.getLocationY();
+            if (m_world) {
+                m_world.MouseUp(this.GetTouchNode(x ,y));
+            };
+        });
+        this.touchNode.on(cc.Node.EventType.TOUCH_CANCEL, (evt) => {
+            let x = evt.getLocationX();
+            let y = evt.getLocationY();
+            if (m_world) {
+                m_world.MouseUp(this.GetTouchNode(x ,y));
+            };
+        });
+
+        document.onkeydown = (evt) => {
+            if (m_world) {
+                m_world.evterKeyDown.Call(evt.key);
+            };
+        };
+    }
+
+    private GetTouchNode (x: number, y: number) {
+        let relCenterX = x - this.node.width / 2;
+        let relCenterY = y - this.node.height / 2;
+        return new b2Vec2(relCenterX / configCenter.b2ShapeScale, relCenterY / configCenter.b2ShapeScale);
     }
 }

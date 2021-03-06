@@ -1,5 +1,7 @@
 import { b2Vec2, b2World } from "../lib/box2d_ts/Box2D";
 import B2ExamCharacterCollision from "./view/b2_example/B2ExamCharacterCollision";
+import B2ExamMobile from "./view/b2_example/B2ExamMobile";
+import B2ExamMotorJoint from "./view/b2_example/B2ExamMotorJoint";
 import B2ExamSparky from "./view/b2_example/B2ExamSparky";
 import B2ExamTumber from "./view/b2_example/B2ExamTumber";
 import ExamContext from "./view/ExamContext";
@@ -95,10 +97,10 @@ namespace configCenter {
         {
             info: `Continuous Test`,
             b2WorldCreator: null
-        },
+        }, 
         {
             info: `Motor Joint`,
-            b2WorldCreator: null
+            b2WorldCreator: B2ExamMotorJoint
         },
         {
             info: `One-Sided Platform`,
@@ -106,7 +108,7 @@ namespace configCenter {
         },
         {
             info: `Mobile`,
-            b2WorldCreator: null
+            b2WorldCreator: B2ExamMobile
         }
     ]
 
