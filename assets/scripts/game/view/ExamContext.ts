@@ -27,10 +27,9 @@ export default class ExamContext {
         const bodyDef = new b2BodyDef();
         this.ground = this.b2w.CreateBody(bodyDef);
 
-        this.evterUpdate.On(( passedMs ) => {
+        this.evterUpdate.On(( passedSeconds ) => {
             // 每次最大推进值为 16
-            passedMs = passedMs < 16 ? passedMs : 16;
-            b2w.Step( passedMs, 8, 8);
+            b2w.Step( passedSeconds, 8, 8, 8);
         });
     }
 

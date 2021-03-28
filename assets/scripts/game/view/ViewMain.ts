@@ -58,7 +58,12 @@ export default class ViewMain extends MgrViewNoArgsViewBasic {
                 rb.Refresh();
             });
         });
-        evter.Call(dataCenter.vo.selectExam);
+        // 读取合法存档
+        let selectExam = 0;
+        if (0 <= dataCenter.vo.selectExam && dataCenter.vo.selectExam <= configCenter.examArr.length - 1) {
+            selectExam = dataCenter.vo.selectExam;
+        };
+        evter.Call(selectExam);
 
         var frameMsClock = new FrameMsClock();
         frameMsClock.evntMsPassed.On((passedMs) => {
@@ -67,8 +72,8 @@ export default class ViewMain extends MgrViewNoArgsViewBasic {
                 return;
             };
             let stepTme = 16 < passedMs ? 0.016 : passedMs / 1000;
-            m_world.evterUpdate.Call(stepTme);
             Box2DDrawer.inst.DrawB2World(m_world.b2w);
+            m_world.evterUpdate.Call(stepTme);
         });
         frameMsClock.Resume();
 

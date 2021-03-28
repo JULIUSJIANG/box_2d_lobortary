@@ -50,6 +50,7 @@ const B2ExamMotorJoint = () => {
 
     ctx.evterKeyDown.On(( key ) => {
         m_go = !m_go;
+        console.log(`m_go[${m_go}]`);
     });
 
     let m_time = 0;
