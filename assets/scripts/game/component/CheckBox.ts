@@ -7,6 +7,7 @@
 
 import EventerNoArgs from "../../frame/basic/EventerNoArgs";
 import EventerWithArgs from "../../frame/basic/EventerWithArgs";
+import b2ElementExtend from "../../lib/b2_extend/b2_element/B2ElementExtend";
 import configCenter from "../ConfigCenter";
 import dataCenter from "../DataCenter";
 
@@ -49,8 +50,9 @@ export default class CheckBox extends cc.Component {
         index: number
     ) {
         this.index = index;
-        let cfg = configCenter.checkBoxData[index];
-        this.label.string = this.actLab.string = cfg.info;
+        let cfg = b2ElementExtend.rd.list[index];
+        let name = b2ElementExtend.rd.nameDict.get(cfg);
+        this.label.string = this.actLab.string = `${name}`;
         this.touchNode.on(cc.Node.EventType.TOUCH_START, () => {
             this.evter.Call();
         });

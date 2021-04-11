@@ -12,7 +12,11 @@ class RegistDefine<K, V extends RDClass<T>, T> {
      * 字典形式
      */
     map: Map<K, T> = new Map();
-    
+    /**
+     * 名称记录
+     */
+    nameDict: Map<T, string> = new Map();
+
     /**
      * 
      * @param originObject 存储了注册信息的对象
@@ -29,13 +33,14 @@ class RegistDefine<K, V extends RDClass<T>, T> {
         if (originObject == null) {
             return;
         };
-        var vals = Object.values(originObject);
-        vals.forEach(( val ) => {
+        for (let key in originObject) {
+            let val = originObject[ key ];
             if (val instanceof type) {
+                this.nameDict.set(val.cont, key);
                 this.list.push(val.cont);
                 this.map.set(keyGetter(val.cont), val.cont);
             };
-        });
+        };
     }
 
     /**

@@ -8,7 +8,7 @@ namespace b2EleSetting {
     /**
      * 点半径
      */
-    export const dotRadius = 2;
+    export const dotRadius = 3;
     /**
      * 表示很远的距离
      */
@@ -75,7 +75,7 @@ namespace b2EleSetting {
          * 碰撞点的颜色
          */
         contactPoint: {
-            dot: new cc.Color(255, 255, 100, 100)
+            dot: new cc.Color(255, 255, 100, 255)
         },
 
         /**

@@ -10,11 +10,14 @@ class B2ElementRS<T> extends RDClass<B2ElementRS.Cont<T>> {
     /**
      * 绘制列表
      */
-    public static eleDrawFuncList: Array<(b2w: b2World, gd: GraphicsDrawer) => void> = [];
+    public static eleDrawFuncList: Array<(b2w: b2World, gd: GraphicsDrawer, drawTag: number) => void> = [];
 
     constructor (cont: B2ElementRS.Cont<T>) {
         super(cont);
-        B2ElementRS.eleDrawFuncList.push(( b2w, gd ) => {
+        B2ElementRS.eleDrawFuncList.push(( b2w, gd, drawDag ) => {
+            if (!(drawDag & cont.drawAbleTag)) {
+                return;
+            };
             let list = cont.arrayGetter(b2w);
             list.forEach(( ele ) => {
                 cont.tDrawer(ele, gd);

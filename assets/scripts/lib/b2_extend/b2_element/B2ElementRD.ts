@@ -130,36 +130,10 @@ namespace b2ElementRD {
     });
 
     /**
-     * 碰撞点
-     */
-    export const contact = new B2ElementRS<b2Vec2>({
-        drawAbleTag: 2**4,
-        arrayGetter: (b2w) => {
-            let list: b2Vec2[] = [];
-            let b2wm = new b2WorldManifold();
-            for (let b2c = b2w.GetContactManager().m_contactList; b2c; b2c = b2c.GetNext()) {
-                b2c.GetWorldManifold(b2wm);
-                list.push(...b2wm.points.map(( pos ) => {
-                    return (new b2Vec2().Set(pos.x, pos.y));
-                }));
-            };
-            return list;
-        },
-        tDrawer: (point, gd) => {
-            gd.RoundFill(
-                point.x,
-                point.y,
-                gd.Pixel(b2EleSetting.dotRadius),
-                b2EleSetting.color.contactPoint.dot
-            );
-        }
-    });
-
-    /**
      * 粒子
      */
     export const particle = new B2ElementRS<b2ParticleSystem>({
-        drawAbleTag: 2**5,
+        drawAbleTag: 2**4,
         arrayGetter: (b2w) => {
             let list: b2ParticleSystem[] = [];
             for (let b2p = b2w.GetParticleSystemList(); b2p; b2p = b2p.GetNext()) {
@@ -194,7 +168,7 @@ namespace b2ElementRD {
      * 约束器
      */
     export const controller = new B2ElementRS<b2Controller>({
-        drawAbleTag: 2**6,
+        drawAbleTag: 2**5,
         arrayGetter: (b2w) => {
             let list: b2Controller[] = [];
             for (let b2c = b2w.m_controllerList; b2c; b2c = b2c.GetNext()) {
@@ -204,6 +178,33 @@ namespace b2ElementRD {
         },
         tDrawer: (b2c, gd) => {
             b2ControllerExtend.DrawController(b2c, gd);
+        }
+    });
+
+    
+    /**
+     * 碰撞点
+     */
+     export const contact = new B2ElementRS<b2Vec2>({
+        drawAbleTag: 2**6,
+        arrayGetter: (b2w) => {
+            let list: b2Vec2[] = [];
+            let b2wm = new b2WorldManifold();
+            for (let b2c = b2w.GetContactManager().m_contactList; b2c; b2c = b2c.GetNext()) {
+                b2c.GetWorldManifold(b2wm);
+                list.push(...b2wm.points.map(( pos ) => {
+                    return (new b2Vec2().Set(pos.x, pos.y));
+                }));
+            };
+            return list;
+        },
+        tDrawer: (point, gd) => {
+            gd.RoundFill(
+                point.x,
+                point.y,
+                gd.Pixel(b2EleSetting.dotRadius),
+                b2EleSetting.color.contactPoint.dot
+            );
         }
     });
 }
